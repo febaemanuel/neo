@@ -108,6 +108,33 @@
                         <label for="bhutani-bt">Bilirrubina Total (mg/dL)</label>
                         <input type="number" id="bhutani-bt" min="0" max="30" placeholder="Ex: 8.5" step="0.1">
                     </div>
+                    <div class="form-group">
+                        <label>Fatores de Risco para Hiperbilirrubinemia Grave (AAP)</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="bhutani-risk-earlyjaundice"> Icterícia precoce (antes de 24h de vida)
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="bhutani-risk-hemolytic"> Doença hemolítica (incomp. Rh, ABO, antígenos irregulares, def. G6PD)
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="bhutani-risk-preterm"> Prematuridade (IG 35&ndash;36 semanas)
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="bhutani-risk-breastfeeding"> Dificuldade no aleitamento materno exclusivo ou perda de peso &gt; 7%
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="bhutani-risk-cephalhematoma"> Céfalo-hematoma ou equimoses extensas
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="bhutani-risk-asian"> Descendência asiática
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="bhutani-risk-sibling"> Irmão com icterícia que necessitou fototerapia
+                            </label>
+                        </div>
+                    </div>
+
                     <button class="btn-primary" id="bhutani-calculate">Avaliar Risco</button>
 
                     <div id="bhutani-result" class="result-box hidden">
@@ -122,6 +149,19 @@
                             <li><span class="zone-dot high-intermediate"></span> Risco Intermediário Alto (p75-p95)</li>
                             <li><span class="zone-dot low-intermediate"></span> Risco Intermediário Baixo (p40-p75)</li>
                             <li><span class="zone-dot low-risk"></span> Baixo Risco (&lt; percentil 40)</li>
+                        </ul>
+                    </div>
+                    <div class="info-box" style="margin-top: 0.75rem;">
+                        <h4>Fatores de Risco Maiores (AAP)</h4>
+                        <ul style="font-size: 0.82rem; padding-left: 1.2rem; margin: 0.3rem 0 0;">
+                            <li>BT na zona de alto risco (&gt; p95) ou intermediária alta (p75&ndash;p95)</li>
+                            <li>Icterícia nas primeiras 24h de vida</li>
+                            <li>Doença hemolítica (Rh, ABO, G6PD, outras)</li>
+                            <li>IG 35&ndash;36 semanas</li>
+                            <li>Irmão que necessitou de fototerapia</li>
+                            <li>Céfalo-hematoma ou equimoses</li>
+                            <li>Aleitamento materno exclusivo com dificuldade</li>
+                            <li>Descendência asiática</li>
                         </ul>
                     </div>
                 </div>
@@ -210,18 +250,31 @@
         <section id="tool-rodwell" class="tool-panel">
             <div class="tool-header">
                 <h2>Índice de Rodwell &mdash; Escore de Sepse Neonatal</h2>
-                <p class="tool-description">Insira os dados do RN e os valores do hemograma. O sistema calcula automaticamente o escore (Rodwell et al., 1988).</p>
+                <p class="tool-description">Insira os dados do RN e os valores do hemograma. O sistema calcula automaticamente o escore usando referências de Manroe (1979) para PN &ge; 1500g e Mouzinho (1994) para PN &lt; 1500g.</p>
             </div>
             <div class="tool-body two-col">
                 <div class="input-section">
                     <fieldset class="rodwell-fieldset">
                         <legend>Dados do RN</legend>
                         <div class="form-group">
+                            <label for="rodwell-weight-category">Peso ao Nascer</label>
+                            <select id="rodwell-weight-category">
+                                <option value="term" selected>&ge; 1.500g (Manroe 1979)</option>
+                                <option value="vlbw">&lt; 1.500g (Mouzinho 1994)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="rodwell-age">Idade do RN</label>
                             <select id="rodwell-age">
-                                <option value="birth">Ao nascer (&lt; 12h)</option>
-                                <option value="12-24">12 &ndash; 24 horas</option>
-                                <option value="gt2d" selected>&gt; 2 dias de vida</option>
+                                <option value="nascimento">Nascimento (&lt; 12h)</option>
+                                <option value="12h">12 horas</option>
+                                <option value="24h">24 horas</option>
+                                <option value="36h">36 horas</option>
+                                <option value="48h">48 horas</option>
+                                <option value="60h">60 horas</option>
+                                <option value="72h">72 horas</option>
+                                <option value="120h">120 horas (5 dias)</option>
+                                <option value="4-28d" selected>4 a 28 dias de vida</option>
                             </select>
                         </div>
                     </fieldset>
@@ -265,15 +318,47 @@
 
                 <div class="chart-section">
                     <div class="info-box rodwell-interpretation">
+                        <h4>Valores de Referência &mdash; Neutrófilos Totais (/mm&sup3;)</h4>
+                        <table class="score-table" style="font-size: 0.78rem;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">Idade</th>
+                                    <th colspan="2">Neutropenia (&lt;)</th>
+                                    <th colspan="2">Neutrofilia (&gt;)</th>
+                                </tr>
+                                <tr>
+                                    <th>PN&lt;1500g</th>
+                                    <th>PN&ge;1500g</th>
+                                    <th>PN&lt;1500g</th>
+                                    <th>PN&ge;1500g</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Nascimento</td><td>&mdash;</td><td>1.800</td><td>6.300</td><td>5.400</td></tr>
+                                <tr><td>12 horas</td><td>500</td><td>7.800</td><td>6.300</td><td>14.400</td></tr>
+                                <tr><td>24 horas</td><td>1.100</td><td>7.200</td><td>6.300</td><td>12.400</td></tr>
+                                <tr><td>36 horas</td><td>1.100</td><td>3.600</td><td>6.300</td><td>10.000</td></tr>
+                                <tr><td>48 horas</td><td>1.100</td><td>1.800</td><td>6.300</td><td>8.000</td></tr>
+                                <tr><td>60 horas</td><td>1.100</td><td>1.800</td><td>6.000</td><td>7.200</td></tr>
+                                <tr><td>72 horas</td><td>1.100</td><td>1.800</td><td>6.000</td><td>7.200</td></tr>
+                                <tr><td>120 horas</td><td>1.100</td><td>1.800</td><td>6.000</td><td>5.400</td></tr>
+                                <tr><td>4&ndash;28 dv</td><td>1.100</td><td>1.800</td><td>6.000</td><td>5.400</td></tr>
+                            </tbody>
+                        </table>
+                        <p style="font-size: 0.72rem; color: #7f8c8d; margin-top: 0.4rem;">
+                            PN&ge;1500g: Manroe et al., 1979 &bull; PN&lt;1500g: Mouzinho et al., 1994
+                        </p>
+                    </div>
+                    <div class="info-box" style="margin-top: 0.75rem;">
                         <h4>Critérios de Rodwell (1988)</h4>
                         <table class="score-table">
                             <thead>
-                                <tr><th>#</th><th>Critério</th><th>Ponto</th></tr>
+                                <tr><th>#</th><th>Critério</th><th>Pts</th></tr>
                             </thead>
                             <tbody>
                                 <tr><td>1</td><td>Leucócitos anormais (faixa varia por idade)</td><td>1</td></tr>
-                                <tr><td>2</td><td>Contagem total de neutrófilos anormal</td><td>1</td></tr>
-                                <tr><td>3</td><td>Neutrófilos imaturos elevados</td><td>1</td></tr>
+                                <tr><td>2</td><td>Neutrófilos totais anormais (por idade e PN)</td><td>1</td></tr>
+                                <tr><td>3</td><td>Neutrófilos imaturos elevados (&gt; 600 ou &gt; 10%)</td><td>1</td></tr>
                                 <tr><td>4</td><td>Relação I/T &ge; 0,2</td><td>1</td></tr>
                                 <tr><td>5</td><td>Relação I/M &ge; 0,3</td><td>1</td></tr>
                                 <tr><td>6</td><td>Alterações degenerativas dos neutrófilos</td><td>1</td></tr>
@@ -281,7 +366,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="info-box" style="margin-top: 1rem;">
+                    <div class="info-box" style="margin-top: 0.75rem;">
                         <h4>Interpretação do Escore</h4>
                         <table class="score-table">
                             <thead>
@@ -301,7 +386,7 @@
 
     <footer class="app-footer">
         <p>NeoTools HUWC &mdash; Uso exclusivo como ferramenta de apoio. Decisões clínicas devem ser individualizadas.</p>
-        <p class="references">Referências: Fenton TR, Kim JH (2013); INTERGROWTH-21st; Bhutani VK et al. (1999); AAP (2004); Rodwell RL et al. (1988).</p>
+        <p class="references">Referências: Fenton TR, Kim JH (2013); INTERGROWTH-21st; Bhutani VK et al. (1999); AAP (2004); Rodwell RL et al. (1988); Manroe BL et al. (1979); Mouzinho A et al. (1994).</p>
     </footer>
 
     <script src="js/data/fenton2013.js"></script>
