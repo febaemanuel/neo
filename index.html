@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoTools HUWC - Ferramentas de Neonatologia</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0/dist/chartjs-plugin-annotation.min.js"></script>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <h1>NeoTools HUWC</h1>
+            <p class="subtitle">Ferramentas de Neonatologia &mdash; Hospital Universitário Walter Cantídio</p>
+        </div>
+    </header>
+
+    <nav class="tool-nav">
+        <button class="nav-btn active" data-tool="gig-pig">
+            <span class="nav-icon">&#x1F4CA;</span>
+            <span class="nav-label">Calculadora GIG/PIG</span>
+        </button>
+        <button class="nav-btn" data-tool="bhutani">
+            <span class="nav-icon">&#x1F7E1;</span>
+            <span class="nav-label">Nomograma de Bhutani</span>
+        </button>
+        <button class="nav-btn" data-tool="phototherapy">
+            <span class="nav-icon">&#x1F4A1;</span>
+            <span class="nav-label">Fototerapia (AAP 2004)</span>
+        </button>
+        <button class="nav-btn" data-tool="rodwell">
+            <span class="nav-icon">&#x1F9EA;</span>
+            <span class="nav-label">Índice de Rodwell</span>
+        </button>
+    </nav>
+
+    <main class="app-main">
+        <!-- ==================== GIG/PIG CALCULATOR ==================== -->
+        <section id="tool-gig-pig" class="tool-panel active">
+            <div class="tool-header">
+                <h2>Calculadora GIG/PIG</h2>
+                <p class="tool-description">Classificação do peso ao nascer usando curvas de Fenton 2013 (pré-termo) e INTERGROWTH-21st (termo).</p>
+            </div>
+            <div class="tool-body two-col">
+                <div class="input-section">
+                    <div class="form-group">
+                        <label for="gig-ig">Idade Gestacional (semanas + dias)</label>
+                        <div class="ig-input-row">
+                            <input type="number" id="gig-ig-weeks" min="22" max="42" placeholder="Semanas" step="1">
+                            <span class="ig-sep">+</span>
+                            <input type="number" id="gig-ig-days" min="0" max="6" placeholder="Dias" step="1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="gig-sex">Sexo</label>
+                        <select id="gig-sex">
+                            <option value="male">Masculino</option>
+                            <option value="female">Feminino</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="gig-weight">Peso ao Nascer (g)</label>
+                        <input type="number" id="gig-weight" min="200" max="7000" placeholder="Ex: 2500" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="gig-length">Comprimento (cm) <span class="optional">(opcional)</span></label>
+                        <input type="number" id="gig-length" min="20" max="60" placeholder="Ex: 48" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="gig-hc">Perímetro Cefálico (cm) <span class="optional">(opcional)</span></label>
+                        <input type="number" id="gig-hc" min="15" max="45" placeholder="Ex: 34" step="0.1">
+                    </div>
+                    <button class="btn-primary" id="gig-calculate">Calcular</button>
+
+                    <div id="gig-result" class="result-box hidden">
+                        <h3>Resultado</h3>
+                        <div id="gig-result-content"></div>
+                        <p class="curve-ref" id="gig-curve-ref"></p>
+                    </div>
+                </div>
+                <div class="chart-section">
+                    <div class="chart-tabs">
+                        <button class="chart-tab active" data-chart="weight">Peso</button>
+                        <button class="chart-tab" data-chart="length">Comprimento</button>
+                        <button class="chart-tab" data-chart="hc">Per. Cefálico</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="gig-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== BHUTANI NOMOGRAM ==================== -->
+        <section id="tool-bhutani" class="tool-panel">
+            <div class="tool-header">
+                <h2>Nomograma de Bhutani</h2>
+                <p class="tool-description">Avaliação do risco de hiperbilirrubinemia com base na bilirrubina sérica total (BT) e horas de vida.</p>
+            </div>
+            <div class="tool-body two-col">
+                <div class="input-section">
+                    <div class="form-group">
+                        <label for="bhutani-hours">Horas de vida</label>
+                        <input type="number" id="bhutani-hours" min="0" max="144" placeholder="Ex: 24" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="bhutani-bt">Bilirrubina Total (mg/dL)</label>
+                        <input type="number" id="bhutani-bt" min="0" max="30" placeholder="Ex: 8.5" step="0.1">
+                    </div>
+                    <button class="btn-primary" id="bhutani-calculate">Avaliar Risco</button>
+
+                    <div id="bhutani-result" class="result-box hidden">
+                        <h3>Zona de Risco</h3>
+                        <div id="bhutani-result-content"></div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Zonas de Risco</h4>
+                        <ul class="zone-legend">
+                            <li><span class="zone-dot high-risk"></span> Alto Risco (&ge; percentil 95)</li>
+                            <li><span class="zone-dot high-intermediate"></span> Risco Intermediário Alto (p75-p95)</li>
+                            <li><span class="zone-dot low-intermediate"></span> Risco Intermediário Baixo (p40-p75)</li>
+                            <li><span class="zone-dot low-risk"></span> Baixo Risco (&lt; percentil 40)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="chart-section">
+                    <div class="chart-container">
+                        <canvas id="bhutani-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PHOTOTHERAPY TOOL ==================== -->
+        <section id="tool-phototherapy" class="tool-panel">
+            <div class="tool-header">
+                <h2>Indicação de Fototerapia &mdash; AAP 2004</h2>
+                <p class="tool-description">Diretrizes da Academia Americana de Pediatria (2004) para indicação de fototerapia e exsanguíneotransfusão em RN &ge; 35 semanas.</p>
+            </div>
+            <div class="tool-body two-col">
+                <div class="input-section">
+                    <div class="form-group">
+                        <label for="photo-ig">Idade Gestacional ao Nascer (semanas)</label>
+                        <select id="photo-ig">
+                            <option value="35">35 semanas (0/7 a 6/7)</option>
+                            <option value="36">36 semanas (0/7 a 6/7)</option>
+                            <option value="37">37 semanas (0/7 a 6/7)</option>
+                            <option value="38" selected>≥ 38 semanas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="photo-hours">Horas de vida</label>
+                        <input type="number" id="photo-hours" min="0" max="168" placeholder="Ex: 48" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="photo-bt">Bilirrubina Total (mg/dL)</label>
+                        <input type="number" id="photo-bt" min="0" max="35" placeholder="Ex: 15" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Fatores de Risco</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="photo-risk-isoimmune"> Doença hemolítica isoimune
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="photo-risk-g6pd"> Deficiência de G6PD
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="photo-risk-asphyxia"> Asfixia perinatal
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="photo-risk-lethargy"> Letargia significativa
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="photo-risk-temp"> Instabilidade térmica
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="photo-risk-sepsis"> Sepse
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="photo-risk-albumin"> Albumina &lt; 3.0 g/dL
+                            </label>
+                        </div>
+                    </div>
+                    <button class="btn-primary" id="photo-calculate">Avaliar Indicação</button>
+
+                    <div id="photo-result" class="result-box hidden">
+                        <h3>Resultado</h3>
+                        <div id="photo-result-content"></div>
+                    </div>
+                </div>
+                <div class="chart-section">
+                    <div class="chart-tabs">
+                        <button class="chart-tab active" data-chart="photo">Fototerapia</button>
+                        <button class="chart-tab" data-chart="exchange">Exsanguíneotransfusão</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="photo-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== RODWELL INDEX ==================== -->
+        <section id="tool-rodwell" class="tool-panel">
+            <div class="tool-header">
+                <h2>Índice de Rodwell &mdash; Escore de Sepse Neonatal</h2>
+                <p class="tool-description">Sistema de pontuação hematológica para triagem de sepse neonatal (Rodwell et al., 1988).</p>
+            </div>
+            <div class="tool-body single-col">
+                <div class="rodwell-form">
+                    <div class="rodwell-grid">
+                        <div class="rodwell-item">
+                            <div class="rodwell-label">
+                                <span class="rodwell-num">1</span>
+                                Leucócitos totais (anormal: &lt;5.000 ou &gt;25.000 ao nascer; &gt;30.000 12-24h; &gt;21.000 &gt;2 dias)
+                            </div>
+                            <div class="rodwell-options">
+                                <label class="radio-label"><input type="radio" name="rodwell-1" value="0" checked> Normal (0)</label>
+                                <label class="radio-label"><input type="radio" name="rodwell-1" value="1"> Anormal (1)</label>
+                            </div>
+                        </div>
+                        <div class="rodwell-item">
+                            <div class="rodwell-label">
+                                <span class="rodwell-num">2</span>
+                                Contagem total de neutrófilos (PMN) anormal
+                            </div>
+                            <div class="rodwell-options">
+                                <label class="radio-label"><input type="radio" name="rodwell-2" value="0" checked> Normal (0)</label>
+                                <label class="radio-label"><input type="radio" name="rodwell-2" value="1"> Anormal (1)</label>
+                            </div>
+                        </div>
+                        <div class="rodwell-item">
+                            <div class="rodwell-label">
+                                <span class="rodwell-num">3</span>
+                                Neutrófilos imaturos (bastões/metamielócitos) elevados
+                            </div>
+                            <div class="rodwell-options">
+                                <label class="radio-label"><input type="radio" name="rodwell-3" value="0" checked> Normal (0)</label>
+                                <label class="radio-label"><input type="radio" name="rodwell-3" value="1"> Anormal (1)</label>
+                            </div>
+                        </div>
+                        <div class="rodwell-item">
+                            <div class="rodwell-label">
+                                <span class="rodwell-num">4</span>
+                                Relação I/T (imaturos/total de neutrófilos) &ge; 0,2
+                            </div>
+                            <div class="rodwell-options">
+                                <label class="radio-label"><input type="radio" name="rodwell-4" value="0" checked> Normal (0)</label>
+                                <label class="radio-label"><input type="radio" name="rodwell-4" value="1"> Anormal (1)</label>
+                            </div>
+                        </div>
+                        <div class="rodwell-item">
+                            <div class="rodwell-label">
+                                <span class="rodwell-num">5</span>
+                                Relação I/M (imaturos/maduros neutrófilos) &ge; 0,3
+                            </div>
+                            <div class="rodwell-options">
+                                <label class="radio-label"><input type="radio" name="rodwell-5" value="0" checked> Normal (0)</label>
+                                <label class="radio-label"><input type="radio" name="rodwell-5" value="1"> Anormal (1)</label>
+                            </div>
+                        </div>
+                        <div class="rodwell-item">
+                            <div class="rodwell-label">
+                                <span class="rodwell-num">6</span>
+                                Alterações degenerativas dos neutrófilos (vacuolização, granulações tóxicas, corpúsculos de Döhle)
+                            </div>
+                            <div class="rodwell-options">
+                                <label class="radio-label"><input type="radio" name="rodwell-6" value="0" checked> Normal (0)</label>
+                                <label class="radio-label"><input type="radio" name="rodwell-6" value="1"> Anormal (1)</label>
+                            </div>
+                        </div>
+                        <div class="rodwell-item">
+                            <div class="rodwell-label">
+                                <span class="rodwell-num">7</span>
+                                Contagem de plaquetas &le; 150.000/mm&sup3;
+                            </div>
+                            <div class="rodwell-options">
+                                <label class="radio-label"><input type="radio" name="rodwell-7" value="0" checked> Normal (0)</label>
+                                <label class="radio-label"><input type="radio" name="rodwell-7" value="1"> Anormal (1)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-primary" id="rodwell-calculate">Calcular Escore</button>
+
+                    <div id="rodwell-result" class="result-box hidden">
+                        <h3>Resultado</h3>
+                        <div id="rodwell-result-content"></div>
+                    </div>
+
+                    <div class="info-box rodwell-interpretation">
+                        <h4>Interpretação do Escore</h4>
+                        <table class="score-table">
+                            <thead>
+                                <tr>
+                                    <th>Escore</th>
+                                    <th>Interpretação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>&le; 2</td><td>Sepse improvável (VPN ~99%)</td></tr>
+                                <tr><td>3 &ndash; 4</td><td>Sepse possível &mdash; investigar</td></tr>
+                                <tr><td>&ge; 5</td><td>Sepse provável &mdash; tratar</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>NeoTools HUWC &mdash; Uso exclusivo como ferramenta de apoio. Decisões clínicas devem ser individualizadas.</p>
+        <p class="references">Referências: Fenton TR, Kim JH (2013); INTERGROWTH-21st; Bhutani VK et al. (1999); AAP (2004); Rodwell RL et al. (1988).</p>
+    </footer>
+
+    <script src="js/data/fenton2013.js"></script>
+    <script src="js/data/intergrowth21.js"></script>
+    <script src="js/data/bhutani.js"></script>
+    <script src="js/data/phototherapy-aap2004.js"></script>
+    <script src="js/gig-pig.js"></script>
+    <script src="js/bhutani.js"></script>
+    <script src="js/phototherapy.js"></script>
+    <script src="js/rodwell.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
