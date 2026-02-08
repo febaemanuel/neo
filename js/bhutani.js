@@ -11,6 +11,18 @@ const BhutaniNomogram = (() => {
         drawChart();
     }
 
+    function getCheckedRiskFactors() {
+        const factors = [];
+        if (document.getElementById('bhutani-risk-earlyjaundice').checked) factors.push('Icterícia precoce (< 24h)');
+        if (document.getElementById('bhutani-risk-hemolytic').checked) factors.push('Doença hemolítica');
+        if (document.getElementById('bhutani-risk-preterm').checked) factors.push('Prematuridade (35–36 sem)');
+        if (document.getElementById('bhutani-risk-breastfeeding').checked) factors.push('Dificuldade no AME / perda peso > 7%');
+        if (document.getElementById('bhutani-risk-cephalhematoma').checked) factors.push('Céfalo-hematoma / equimoses');
+        if (document.getElementById('bhutani-risk-asian').checked) factors.push('Descendência asiática');
+        if (document.getElementById('bhutani-risk-sibling').checked) factors.push('Irmão com fototerapia');
+        return factors;
+    }
+
     function evaluate() {
         const hours = parseFloat(document.getElementById('bhutani-hours').value);
         const bt = parseFloat(document.getElementById('bhutani-bt').value);
@@ -25,6 +37,8 @@ const BhutaniNomogram = (() => {
         }
 
         const result = getBhutaniZone(hours, bt);
+        const riskFactors = getCheckedRiskFactors();
+        const hasRisk = riskFactors.length > 0;
 
         const resultBox = document.getElementById('bhutani-result');
         resultBox.className = 'result-box';
@@ -37,13 +51,39 @@ const BhutaniNomogram = (() => {
         };
         resultBox.classList.add(zoneClassMap[result.zone]);
 
-        document.getElementById('bhutani-result-content').innerHTML = `
+        // Risk-adjusted recommendation
+        let recommendation = result.description;
+        if (hasRisk) {
+            if (result.zone === 'high') {
+                recommendation = 'Zona de alto risco COM fatores de risco. Avaliação urgente e iniciar fototerapia conforme indicação.';
+            } else if (result.zone === 'high-int') {
+                recommendation = 'Zona intermediária alta COM fatores de risco. Risco elevado — monitorar como alto risco. Considerar fototerapia.';
+            } else if (result.zone === 'low-int') {
+                recommendation = 'Zona intermediária baixa COM fatores de risco. Reavaliar em 24–48h; alta com retorno precoce (48–72h).';
+            } else {
+                recommendation = 'Zona de baixo risco, porém COM fatores de risco presentes. Seguimento ambulatorial em 48–72h.';
+            }
+        }
+
+        let html = `
             <div class="classification" style="color: ${result.color}">${result.label}</div>
-            <p style="margin-top: 0.5rem; font-size: 0.9rem;">${result.description}</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">${recommendation}</p>
             <p class="percentile-info" style="margin-top: 0.5rem;">
                 BT: ${bt} mg/dL às ${hours}h de vida
             </p>
         `;
+
+        if (riskFactors.length > 0) {
+            html += `<p style="margin-top: 0.4rem; font-size: 0.82rem; color: #c0392b;">
+                <strong>Fatores de risco (${riskFactors.length}):</strong> ${riskFactors.join(', ')}
+            </p>`;
+        } else {
+            html += `<p style="margin-top: 0.4rem; font-size: 0.82rem; color: #7f8c8d;">
+                Nenhum fator de risco selecionado.
+            </p>`;
+        }
+
+        document.getElementById('bhutani-result-content').innerHTML = html;
 
         drawChart(hours, bt, result);
     }
