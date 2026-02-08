@@ -1,10 +1,17 @@
 /**
  * Phototherapy Tool Module — AAP 2004 Guidelines
- * Evaluates need for phototherapy and exchange transfusion for RN >= 35 weeks
+ * Evaluates need for phototherapy and exchange transfusion for RN >= 35 weeks.
+ * Uses scatter chart with numeric x-axis for EXACT patient point positioning.
+ *
+ * AAP 2004 Risk Factors:
+ * - Isoimmune hemolytic disease, G6PD deficiency, asphyxia,
+ *   significant lethargy, temperature instability, sepsis,
+ *   acidosis (pH < 7.15), albumin < 3.0 g/dL
  */
 const PhototherapyTool = (() => {
     let chart = null;
-    let currentChartMode = 'photo'; // 'photo' or 'exchange'
+    let currentChartMode = 'photo';
+    let lastEval = null;
 
     function init() {
         document.getElementById('photo-calculate').addEventListener('click', evaluate);
@@ -14,7 +21,11 @@ const PhototherapyTool = (() => {
                 document.querySelectorAll('#tool-phototherapy .chart-tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 currentChartMode = tab.dataset.chart;
-                drawChart();
+                if (lastEval) {
+                    drawChart(lastEval.hours, lastEval.bt, lastEval.result);
+                } else {
+                    drawChart();
+                }
             });
         });
 
@@ -28,6 +39,7 @@ const PhototherapyTool = (() => {
                document.getElementById('photo-risk-lethargy').checked ||
                document.getElementById('photo-risk-temp').checked ||
                document.getElementById('photo-risk-sepsis').checked ||
+               document.getElementById('photo-risk-acidosis').checked ||
                document.getElementById('photo-risk-albumin').checked;
     }
 
@@ -39,7 +51,8 @@ const PhototherapyTool = (() => {
         if (document.getElementById('photo-risk-lethargy').checked) factors.push('Letargia significativa');
         if (document.getElementById('photo-risk-temp').checked) factors.push('Instabilidade térmica');
         if (document.getElementById('photo-risk-sepsis').checked) factors.push('Sepse');
-        if (document.getElementById('photo-risk-albumin').checked) factors.push('Albumina < 3.0 g/dL');
+        if (document.getElementById('photo-risk-acidosis').checked) factors.push('Acidose (pH < 7,15)');
+        if (document.getElementById('photo-risk-albumin').checked) factors.push('Albumina < 3,0 g/dL');
         return factors;
     }
 
@@ -96,7 +109,12 @@ const PhototherapyTool = (() => {
 
         document.getElementById('photo-result-content').innerHTML = html;
 
+        lastEval = { hours, bt, result };
         drawChart(hours, bt, result);
+    }
+
+    function curveToXY(curve) {
+        return curve.map(p => ({ x: p[0], y: p[1] }));
     }
 
     function drawChart(patientHours, patientBT, patientResult) {
@@ -108,24 +126,20 @@ const PhototherapyTool = (() => {
             ? 'Indicação de Fototerapia — AAP 2004'
             : 'Indicação de Exsanguíneotransfusão — AAP 2004';
 
-        const hours = curveSet.lowerRisk.map(p => p[0]);
-
         const datasets = [
             {
-                label: 'Menor risco (≥38 sem, sem FR)',
-                data: curveSet.lowerRisk.map(p => p[1]),
+                label: 'Menor risco (>=38 sem, sem FR)',
+                data: curveToXY(curveSet.lowerRisk),
                 borderColor: '#27ae60',
-                backgroundColor: 'rgba(39, 174, 96, 0.05)',
                 borderWidth: 2,
                 pointRadius: 0,
                 tension: 0.3,
                 fill: false
             },
             {
-                label: 'Risco médio (≥38+FR ou 35-37 sem)',
-                data: curveSet.mediumRisk.map(p => p[1]),
+                label: 'Risco médio (>=38+FR ou 35-37 sem)',
+                data: curveToXY(curveSet.mediumRisk),
                 borderColor: '#f39c12',
-                backgroundColor: 'rgba(243, 156, 18, 0.05)',
                 borderWidth: 2,
                 pointRadius: 0,
                 tension: 0.3,
@@ -133,9 +147,8 @@ const PhototherapyTool = (() => {
             },
             {
                 label: 'Maior risco (35-37 sem + FR)',
-                data: curveSet.higherRisk.map(p => p[1]),
+                data: curveToXY(curveSet.higherRisk),
                 borderColor: '#e74c3c',
-                backgroundColor: 'rgba(231, 76, 60, 0.05)',
                 borderWidth: 2,
                 pointRadius: 0,
                 tension: 0.3,
@@ -143,27 +156,18 @@ const PhototherapyTool = (() => {
             }
         ];
 
-        // Add patient point
+        // Patient point at EXACT hour
         if (patientHours !== undefined && patientBT !== undefined) {
-            const pointData = hours.map(() => null);
-            let closestIdx = 0;
-            let closestDiff = Infinity;
-            hours.forEach((h, i) => {
-                const diff = Math.abs(h - patientHours);
-                if (diff < closestDiff) { closestDiff = diff; closestIdx = i; }
-            });
-            pointData[closestIdx] = patientBT;
-
             const color = patientResult
                 ? (patientResult.severity === 'exchange' ? '#e74c3c' : patientResult.severity === 'photo' ? '#f39c12' : '#27ae60')
                 : '#8e44ad';
 
             datasets.push({
                 label: 'Paciente',
-                data: pointData,
+                data: [{ x: patientHours, y: patientBT }],
                 borderColor: color,
                 backgroundColor: color,
-                pointRadius: 8,
+                pointRadius: 9,
                 pointStyle: 'crossRot',
                 pointBorderWidth: 3,
                 showLine: false
@@ -171,20 +175,31 @@ const PhototherapyTool = (() => {
         }
 
         chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: hours.map(h => h + 'h'),
-                datasets
-            },
+            type: 'scatter',
+            data: { datasets },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                showLine: true,
                 plugins: {
                     title: { display: true, text: title, font: { size: 13 } },
-                    legend: { position: 'bottom', labels: { font: { size: 10 }, usePointStyle: true } }
+                    legend: { position: 'bottom', labels: { font: { size: 10 }, usePointStyle: true } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} mg/dL (${ctx.parsed.x}h)`;
+                            }
+                        }
+                    }
                 },
                 scales: {
-                    x: { title: { display: true, text: 'Horas de Vida' } },
+                    x: {
+                        type: 'linear',
+                        title: { display: true, text: 'Horas de Vida' },
+                        min: 0,
+                        max: 172,
+                        ticks: { stepSize: 12 }
+                    },
                     y: {
                         title: { display: true, text: 'Bilirrubina Total Sérica (mg/dL)' },
                         min: 0,

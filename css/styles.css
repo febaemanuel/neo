@@ -270,37 +270,18 @@ input[type="number"]:focus, select:focus {
 .zone-dot.low-risk { background: var(--zone-low); }
 
 /* ===== RODWELL ===== */
-.rodwell-grid { display: flex; flex-direction: column; gap: 0.75rem; }
-.rodwell-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1rem;
-    background: var(--surface);
+.rodwell-fieldset {
     border: 1.5px solid var(--border);
     border-radius: var(--radius);
-    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
 }
-.rodwell-label {
-    flex: 1;
-    font-size: 0.88rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-}
-.rodwell-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px; height: 24px;
-    background: var(--primary);
-    color: #fff;
-    border-radius: 50%;
-    font-size: 0.75rem;
+.rodwell-fieldset legend {
     font-weight: 700;
-    flex-shrink: 0;
+    font-size: 0.9rem;
+    color: var(--primary);
+    padding: 0 0.5rem;
 }
-.rodwell-options { display: flex; gap: 0.75rem; flex-shrink: 0; }
 
 .score-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
 .score-table th, .score-table td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }

@@ -162,7 +162,7 @@
                         <label>Fatores de Risco</label>
                         <div class="checkbox-group">
                             <label class="checkbox-label">
-                                <input type="checkbox" id="photo-risk-isoimmune"> Doença hemolítica isoimune
+                                <input type="checkbox" id="photo-risk-isoimmune"> Doença hemolítica isoimune (Coombs direto +)
                             </label>
                             <label class="checkbox-label">
                                 <input type="checkbox" id="photo-risk-g6pd"> Deficiência de G6PD
@@ -180,7 +180,10 @@
                                 <input type="checkbox" id="photo-risk-sepsis"> Sepse
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="photo-risk-albumin"> Albumina &lt; 3.0 g/dL
+                                <input type="checkbox" id="photo-risk-acidosis"> Acidose (pH &lt; 7,15)
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="photo-risk-albumin"> Albumina &lt; 3,0 g/dL
                             </label>
                         </div>
                     </div>
@@ -207,97 +210,82 @@
         <section id="tool-rodwell" class="tool-panel">
             <div class="tool-header">
                 <h2>Índice de Rodwell &mdash; Escore de Sepse Neonatal</h2>
-                <p class="tool-description">Sistema de pontuação hematológica para triagem de sepse neonatal (Rodwell et al., 1988).</p>
+                <p class="tool-description">Insira os dados do RN e os valores do hemograma. O sistema calcula automaticamente o escore (Rodwell et al., 1988).</p>
             </div>
-            <div class="tool-body single-col">
-                <div class="rodwell-form">
-                    <div class="rodwell-grid">
-                        <div class="rodwell-item">
-                            <div class="rodwell-label">
-                                <span class="rodwell-num">1</span>
-                                Leucócitos totais (anormal: &lt;5.000 ou &gt;25.000 ao nascer; &gt;30.000 12-24h; &gt;21.000 &gt;2 dias)
-                            </div>
-                            <div class="rodwell-options">
-                                <label class="radio-label"><input type="radio" name="rodwell-1" value="0" checked> Normal (0)</label>
-                                <label class="radio-label"><input type="radio" name="rodwell-1" value="1"> Anormal (1)</label>
-                            </div>
+            <div class="tool-body two-col">
+                <div class="input-section">
+                    <fieldset class="rodwell-fieldset">
+                        <legend>Dados do RN</legend>
+                        <div class="form-group">
+                            <label for="rodwell-age">Idade do RN</label>
+                            <select id="rodwell-age">
+                                <option value="birth">Ao nascer (&lt; 12h)</option>
+                                <option value="12-24">12 &ndash; 24 horas</option>
+                                <option value="gt2d" selected>&gt; 2 dias de vida</option>
+                            </select>
                         </div>
-                        <div class="rodwell-item">
-                            <div class="rodwell-label">
-                                <span class="rodwell-num">2</span>
-                                Contagem total de neutrófilos (PMN) anormal
-                            </div>
-                            <div class="rodwell-options">
-                                <label class="radio-label"><input type="radio" name="rodwell-2" value="0" checked> Normal (0)</label>
-                                <label class="radio-label"><input type="radio" name="rodwell-2" value="1"> Anormal (1)</label>
-                            </div>
+                    </fieldset>
+
+                    <fieldset class="rodwell-fieldset">
+                        <legend>Hemograma</legend>
+                        <div class="form-group">
+                            <label for="rodwell-wbc">Leucócitos totais (/mm&sup3;)</label>
+                            <input type="number" id="rodwell-wbc" min="0" max="100000" placeholder="Ex: 15000" step="100">
                         </div>
-                        <div class="rodwell-item">
-                            <div class="rodwell-label">
-                                <span class="rodwell-num">3</span>
-                                Neutrófilos imaturos (bastões/metamielócitos) elevados
-                            </div>
-                            <div class="rodwell-options">
-                                <label class="radio-label"><input type="radio" name="rodwell-3" value="0" checked> Normal (0)</label>
-                                <label class="radio-label"><input type="radio" name="rodwell-3" value="1"> Anormal (1)</label>
-                            </div>
+                        <div class="form-group">
+                            <label for="rodwell-neutrophils">Neutrófilos totais (/mm&sup3;)</label>
+                            <input type="number" id="rodwell-neutrophils" min="0" max="80000" placeholder="Ex: 8000" step="100">
                         </div>
-                        <div class="rodwell-item">
-                            <div class="rodwell-label">
-                                <span class="rodwell-num">4</span>
-                                Relação I/T (imaturos/total de neutrófilos) &ge; 0,2
-                            </div>
-                            <div class="rodwell-options">
-                                <label class="radio-label"><input type="radio" name="rodwell-4" value="0" checked> Normal (0)</label>
-                                <label class="radio-label"><input type="radio" name="rodwell-4" value="1"> Anormal (1)</label>
-                            </div>
+                        <div class="form-group">
+                            <label for="rodwell-immature">Neutrófilos imaturos &mdash; bastões + metas + mielo (/mm&sup3;)</label>
+                            <input type="number" id="rodwell-immature" min="0" max="50000" placeholder="Ex: 500" step="50">
                         </div>
-                        <div class="rodwell-item">
-                            <div class="rodwell-label">
-                                <span class="rodwell-num">5</span>
-                                Relação I/M (imaturos/maduros neutrófilos) &ge; 0,3
-                            </div>
-                            <div class="rodwell-options">
-                                <label class="radio-label"><input type="radio" name="rodwell-5" value="0" checked> Normal (0)</label>
-                                <label class="radio-label"><input type="radio" name="rodwell-5" value="1"> Anormal (1)</label>
-                            </div>
+                        <div class="form-group">
+                            <label for="rodwell-platelets">Plaquetas (/mm&sup3;)</label>
+                            <input type="number" id="rodwell-platelets" min="0" max="1000000" placeholder="Ex: 250000" step="1000">
                         </div>
-                        <div class="rodwell-item">
-                            <div class="rodwell-label">
-                                <span class="rodwell-num">6</span>
-                                Alterações degenerativas dos neutrófilos (vacuolização, granulações tóxicas, corpúsculos de Döhle)
-                            </div>
-                            <div class="rodwell-options">
-                                <label class="radio-label"><input type="radio" name="rodwell-6" value="0" checked> Normal (0)</label>
-                                <label class="radio-label"><input type="radio" name="rodwell-6" value="1"> Anormal (1)</label>
-                            </div>
+                    </fieldset>
+
+                    <fieldset class="rodwell-fieldset">
+                        <legend>Morfologia (lâmina)</legend>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="rodwell-degenerative"> Alterações degenerativas (vacuolização, granulações tóxicas, corpúsculos de D&ouml;hle)
+                            </label>
                         </div>
-                        <div class="rodwell-item">
-                            <div class="rodwell-label">
-                                <span class="rodwell-num">7</span>
-                                Contagem de plaquetas &le; 150.000/mm&sup3;
-                            </div>
-                            <div class="rodwell-options">
-                                <label class="radio-label"><input type="radio" name="rodwell-7" value="0" checked> Normal (0)</label>
-                                <label class="radio-label"><input type="radio" name="rodwell-7" value="1"> Anormal (1)</label>
-                            </div>
-                        </div>
-                    </div>
+                    </fieldset>
+
                     <button class="btn-primary" id="rodwell-calculate">Calcular Escore</button>
 
                     <div id="rodwell-result" class="result-box hidden">
                         <h3>Resultado</h3>
                         <div id="rodwell-result-content"></div>
                     </div>
+                </div>
 
+                <div class="chart-section">
                     <div class="info-box rodwell-interpretation">
+                        <h4>Critérios de Rodwell (1988)</h4>
+                        <table class="score-table">
+                            <thead>
+                                <tr><th>#</th><th>Critério</th><th>Ponto</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>Leucócitos anormais (faixa varia por idade)</td><td>1</td></tr>
+                                <tr><td>2</td><td>Contagem total de neutrófilos anormal</td><td>1</td></tr>
+                                <tr><td>3</td><td>Neutrófilos imaturos elevados</td><td>1</td></tr>
+                                <tr><td>4</td><td>Relação I/T &ge; 0,2</td><td>1</td></tr>
+                                <tr><td>5</td><td>Relação I/M &ge; 0,3</td><td>1</td></tr>
+                                <tr><td>6</td><td>Alterações degenerativas dos neutrófilos</td><td>1</td></tr>
+                                <tr><td>7</td><td>Plaquetas &le; 150.000/mm&sup3;</td><td>1</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="info-box" style="margin-top: 1rem;">
                         <h4>Interpretação do Escore</h4>
                         <table class="score-table">
                             <thead>
-                                <tr>
-                                    <th>Escore</th>
-                                    <th>Interpretação</th>
-                                </tr>
+                                <tr><th>Escore</th><th>Interpretação</th></tr>
                             </thead>
                             <tbody>
                                 <tr><td>&le; 2</td><td>Sepse improvável (VPN ~99%)</td></tr>
